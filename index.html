@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>员工心理状态测评</title>
+    <title>员工性格测评</title>
     <style>
         * {
             box-sizing: border-box;
@@ -27,7 +27,6 @@
             border-radius: 36px;
             padding: 40px 35px 30px;
             box-shadow: 0 20px 50px rgba(0, 20, 40, 0.10);
-            transition: all 0.2s;
         }
         .header {
             display: flex;
@@ -66,6 +65,81 @@
             border-radius: 40px;
             transition: width 0.35s ease;
         }
+
+        /* 基本信息样式 */
+        .info-section {
+            background: #f8fbff;
+            border-radius: 20px;
+            padding: 22px 24px;
+            margin-bottom: 24px;
+            border: 2px solid #dce8f5;
+        }
+        .info-section h3 {
+            font-size: 17px;
+            color: #1f3a5f;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .info-section h3 span {
+            background: #1f4e8c;
+            color: white;
+            font-size: 13px;
+            border-radius: 30px;
+            padding: 0 14px;
+            line-height: 26px;
+        }
+        .info-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px 20px;
+        }
+        .info-group {
+            flex: 1 0 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .info-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a314b;
+        }
+        .info-group label .required {
+            color: #c0392b;
+            margin-left: 2px;
+        }
+        .info-group input,
+        .info-group select {
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1.5px solid #d5e0ed;
+            font-size: 15px;
+            background: white;
+            transition: 0.15s;
+            outline: none;
+            font-family: inherit;
+        }
+        .info-group input:focus,
+        .info-group select:focus {
+            border-color: #2a6bb0;
+            box-shadow: 0 0 0 3px rgba(42, 107, 176, 0.12);
+        }
+        .info-group input:disabled,
+        .info-group select:disabled {
+            background: #f0f4fa;
+            color: #4a5f7a;
+            cursor: not-allowed;
+        }
+        .info-error {
+            color: #c0392b;
+            font-size: 13px;
+            margin-top: 2px;
+            display: none;
+        }
+
+        /* 问卷样式 */
         .question-area {
             padding: 10px 0 10px;
         }
@@ -113,7 +187,6 @@
             color: #1d3a5a;
             cursor: pointer;
             transition: all 0.15s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -126,9 +199,6 @@
         }
         .options-grid input[type="radio"] {
             display: none;
-        }
-        .options-grid input[type="radio"]:checked + span {
-            color: #1a3f69;
         }
         .options-grid label:has(input:checked) {
             background: #dce8fa;
@@ -150,9 +220,6 @@
             background: #f1f5fa;
             border-color: #ccd8e8;
         }
-        .options-grid label.disabled input:checked + span {
-            color: #1f3a5f;
-        }
 
         .action-row {
             display: flex;
@@ -164,17 +231,16 @@
         }
         .btn {
             border: none;
-            background: #e3ecf9;
             padding: 14px 34px;
             border-radius: 60px;
             font-weight: 600;
             font-size: 16px;
-            color: #1a3a60;
             cursor: pointer;
             transition: 0.15s;
             border: 1px solid transparent;
             flex: 1 0 auto;
             min-width: 100px;
+            font-family: inherit;
         }
         .btn-primary {
             background: #1f4e8c;
@@ -201,21 +267,6 @@
         .btn-secondary:disabled {
             opacity: 0.4;
             cursor: not-allowed;
-        }
-        .btn-success {
-            background: #257a4a;
-            color: white;
-        }
-        .btn-success:hover:not(:disabled) {
-            background: #1a633a;
-        }
-        .btn-outline {
-            background: transparent;
-            border: 2px solid #b8cee8;
-            color: #1f4a73;
-        }
-        .btn-outline:hover:not(:disabled) {
-            background: #e7effb;
         }
         .status-msg {
             font-size: 14px;
@@ -245,6 +296,21 @@
             font-weight: 700;
             font-size: 20px;
         }
+        .result-summary .info-display {
+            background: #edf4fc;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: #1a3f60;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 24px;
+        }
+        .result-summary .info-display span {
+            font-weight: 500;
+        }
+
         .footnote {
             margin-top: 24px;
             font-size: 14px;
@@ -258,24 +324,49 @@
             color: #b13e3e;
         }
 
+        /* 锁定提示横幅 */
+        .lock-banner {
+            background: #fef3e2;
+            border: 2px solid #f0c27a;
+            border-radius: 14px;
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            color: #8a6d3b;
+            font-weight: 600;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+        .lock-banner .icon {
+            font-size: 22px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
         @media (max-width: 500px) {
             .card { padding: 28px 18px; }
             .q-text { font-size: 19px; }
             .options-grid label { min-width: 50px; padding: 12px 4px; font-size: 15px; }
             .btn { padding: 12px 20px; font-size: 15px; }
+            .info-group { flex: 1 0 140px; }
         }
     </style>
 </head>
 <body>
 <div class="card" id="app">
     <div class="header">
-        <span class="title">🧠 心理测评</span>
+        <span class="title">🧠 性格测评</span>
         <span class="badge" id="progressText">1 / 22</span>
     </div>
     <div class="progress-wrap">
         <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
     </div>
 
+    <!-- 动态内容区 -->
     <div id="dynamicContent"></div>
 
     <div class="footnote">
@@ -286,6 +377,7 @@
 
 <script>
     (function() {
+        // ---------- 题目数据 ----------
         const dimensions = [
             {
                 name: '情绪状态',
@@ -353,14 +445,68 @@
         });
         const TOTAL = flatItems.length;
 
+        // ---------- localStorage 键名 ----------
+        const STORAGE_KEY = 'psych_test_data';
+
+        // ---------- 从 localStorage 加载数据 ----------
+        function loadSavedData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return null;
+                const data = JSON.parse(raw);
+                // 验证数据结构
+                if (data && typeof data === 'object' && Array.isArray(data.answers) && data.answers.length === TOTAL) {
+                    return data;
+                }
+                return null;
+            } catch {
+                return null;
+            }
+        }
+
+        // ---------- 保存到 localStorage ----------
+        function saveToStorage() {
+            const data = {
+                answers: answers,
+                locked: locked,
+                infoCompleted: infoCompleted,
+                employeeInfo: employeeInfo,
+                completedAt: new Date().toISOString()
+            };
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            } catch (e) {
+                // 忽略存储错误
+            }
+        }
+
+        // ---------- 状态 ----------
         let answers = new Array(TOTAL).fill(null);
         let currentIndex = 0;
         let locked = false;
+
+        let employeeInfo = {
+            name: '',
+            department: '',
+            employeeId: '',
+            phone: ''
+        };
+        let infoCompleted = false;
+
+        // ---------- 尝试加载已保存数据 ----------
+        const saved = loadSavedData();
+        if (saved) {
+            answers = saved.answers;
+            locked = saved.locked || false;
+            infoCompleted = saved.infoCompleted || false;
+            employeeInfo = saved.employeeInfo || { name: '', department: '', employeeId: '', phone: '' };
+        }
 
         const contentEl = document.getElementById('dynamicContent');
         const progressText = document.getElementById('progressText');
         const progressBar = document.getElementById('progressBar');
 
+        // ---------- 工具函数 ----------
         function getScore() {
             let total = 0;
             let allFilled = true;
@@ -388,16 +534,154 @@
         }
 
         function updateProgress() {
-            const shown = currentIndex + 1;
+            if (locked) {
+                progressText.textContent = `${TOTAL} / ${TOTAL}`;
+                progressBar.style.width = '100%';
+                return;
+            }
+            const shown = Math.min(currentIndex + 1, TOTAL);
             progressText.textContent = `${shown} / ${TOTAL}`;
             const pct = (currentIndex / TOTAL) * 100;
             progressBar.style.width = `${Math.min(pct, 100)}%`;
         }
 
-        function renderQuestion() {
-            if (locked || currentIndex >= TOTAL) {
+        // ---------- 渲染：员工信息页 ----------
+        function renderInfoPage() {
+            // 如果已锁定，直接显示完成页
+            if (locked) {
                 renderCompletePage();
                 return;
+            }
+
+            let html = `
+                <div class="info-section">
+                    <h3>📋 员工基本信息 <span>必填</span></h3>
+                    <div class="info-row">
+                        <div class="info-group">
+                            <label>姓名 <span class="required">*</span></label>
+                            <input type="text" id="infoName" placeholder="请输入您的姓名" value="${employeeInfo.name}">
+                            <div class="info-error" id="nameError">请输入姓名</div>
+                        </div>
+                        <div class="info-group">
+                            <label>部门 <span class="required">*</span></label>
+                            <input type="text" id="infoDept" placeholder="请输入所在部门" value="${employeeInfo.department}">
+                            <div class="info-error" id="deptError">请输入部门</div>
+                        </div>
+                        <div class="info-group">
+                            <label>工号 <span class="required">*</span></label>
+                            <input type="text" id="infoId" placeholder="请输入工号" value="${employeeInfo.employeeId}">
+                            <div class="info-error" id="idError">请输入工号</div>
+                        </div>
+                        <div class="info-group">
+                            <label>联系方式</label>
+                            <input type="text" id="infoPhone" placeholder="手机号或邮箱（选填）" value="${employeeInfo.phone}">
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin: 10px 0 8px;">
+                    <button class="btn btn-primary" id="startBtn" style="padding: 16px 50px; font-size: 18px;">开始测评 →</button>
+                </div>
+                <div style="text-align: center; font-size: 14px; color: #7a8fa5;">请先填写基本信息，再开始答题</div>
+            `;
+
+            contentEl.innerHTML = html;
+            progressText.textContent = '📋 基本信息';
+            progressBar.style.width = '0%';
+
+            document.getElementById('startBtn').addEventListener('click', function() {
+                if (validateInfo()) {
+                    employeeInfo.name = document.getElementById('infoName').value.trim();
+                    employeeInfo.department = document.getElementById('infoDept').value.trim();
+                    employeeInfo.employeeId = document.getElementById('infoId').value.trim();
+                    employeeInfo.phone = document.getElementById('infoPhone').value.trim();
+                    infoCompleted = true;
+                    currentIndex = 0;
+                    saveToStorage();
+                    renderQuestion();
+                }
+            });
+
+            document.querySelectorAll('#infoName, #infoDept, #infoId, #infoPhone').forEach(input => {
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        document.getElementById('startBtn').click();
+                    }
+                });
+                input.addEventListener('input', function() {
+                    const id = this.id;
+                    const errorEl = document.getElementById(id.replace('info', '').toLowerCase() + 'Error');
+                    if (errorEl) {
+                        if (this.value.trim()) {
+                            errorEl.style.display = 'none';
+                            this.style.borderColor = '#d5e0ed';
+                        }
+                    }
+                });
+            });
+        }
+
+        function validateInfo() {
+            let valid = true;
+            const name = document.getElementById('infoName').value.trim();
+            const dept = document.getElementById('infoDept').value.trim();
+            const empId = document.getElementById('infoId').value.trim();
+
+            const nameError = document.getElementById('nameError');
+            const deptError = document.getElementById('deptError');
+            const idError = document.getElementById('idError');
+
+            if (!name) {
+                nameError.style.display = 'block';
+                document.getElementById('infoName').style.borderColor = '#c0392b';
+                valid = false;
+            } else {
+                nameError.style.display = 'none';
+            }
+
+            if (!dept) {
+                deptError.style.display = 'block';
+                document.getElementById('infoDept').style.borderColor = '#c0392b';
+                valid = false;
+            } else {
+                deptError.style.display = 'none';
+            }
+
+            if (!empId) {
+                idError.style.display = 'block';
+                document.getElementById('infoId').style.borderColor = '#c0392b';
+                valid = false;
+            } else {
+                idError.style.display = 'none';
+            }
+
+            if (!valid) {
+                alert('请填写所有必填项（姓名、部门、工号）');
+            }
+            return valid;
+        }
+
+        // ---------- 渲染题目 ----------
+        function renderQuestion() {
+            if (locked) {
+                renderCompletePage();
+                return;
+            }
+
+            if (!infoCompleted) {
+                renderInfoPage();
+                return;
+            }
+
+            // 检查是否所有题目都已答完（已全部完成但未锁定）
+            const allAnswered = answers.every(a => a !== null);
+            if (allAnswered && currentIndex >= TOTAL - 1) {
+                // 全部答完，自动进入完成页（但保留提交按钮）
+                // 但这里继续显示最后一题，让用户点击提交
+            }
+
+            if (currentIndex >= TOTAL) {
+                // 如果索引超出，重置到最后一题
+                currentIndex = TOTAL - 1;
             }
 
             const item = flatItems[currentIndex];
@@ -451,6 +735,7 @@
             updateProgress();
         }
 
+        // ---------- 绑定事件 ----------
         function bindEvents(idx) {
             const radios = document.querySelectorAll('input[name="q"]');
             radios.forEach(radio => {
@@ -458,6 +743,7 @@
                     if (locked) return;
                     const val = parseInt(this.value, 10);
                     answers[idx] = val;
+                    saveToStorage();
                     renderQuestion();
                 });
             });
@@ -497,38 +783,57 @@
                         alert('还有题目未作答，请完成全部题目。');
                         return;
                     }
+                    // 锁定
                     locked = true;
+                    saveToStorage();
                     renderCompletePage();
                 });
             }
         }
 
+        // ---------- 完成页（无重置按钮） ----------
         function renderCompletePage() {
             const { total, allFilled } = getScore();
             const info = getLevel(total);
             locked = true;
 
-            let html = `<div class="complete-icon">📋</div>`;
+            let html = `
+                <div class="lock-banner">
+                    <span class="icon">🔒</span>
+                    测评已提交，答案已锁定，不可修改
+                </div>
+            `;
+
+            html += `<div class="complete-icon">📋</div>`;
             html += `<h3 style="text-align:center; font-size:22px; margin-bottom:4px;">测评已完成</h3>`;
-            html += `<p style="text-align:center; color:#3a5f7a; font-size:15px;">答案已锁定，不可修改</p>`;
+            html += `<p style="text-align:center; color:#3a5f7a; font-size:15px;">感谢您的参与！</p>`;
+
+            // 显示员工信息
+            html += `<div class="result-summary">
+                        <div class="info-display">
+                            <span>👤 姓名：${employeeInfo.name || '未填写'}</span>
+                            <span>🏢 部门：${employeeInfo.department || '未填写'}</span>
+                            <span>🆔 工号：${employeeInfo.employeeId || '未填写'}</span>
+                            ${employeeInfo.phone ? `<span>📞 ${employeeInfo.phone}</span>` : ''}
+                        </div>`;
 
             if (allFilled) {
-                html += `<div class="result-summary">
-                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-                                <span style="font-size:18px; font-weight:500;">总分</span>
-                                <span class="big-score">${total} <span style="font-size:20px; font-weight:400; color:#3a5f7a;">/ 110</span></span>
-                            </div>
-                            <div style="margin-top:14px;">
-                                <div class="level-tag">${info.level}</div>
-                                <div style="margin-top:6px; color:#1f3f60;">${info.desc}</div>
-                            </div>
+                html += `<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+                            <span style="font-size:18px; font-weight:500;">总分</span>
+                            <span class="big-score">${total} <span style="font-size:20px; font-weight:400; color:#3a5f7a;">/ 110</span></span>
+                         </div>
+                         <div style="margin-top:14px;">
+                            <div class="level-tag">${info.level}</div>
+                            <div style="margin-top:6px; color:#1f3f60;">${info.desc}</div>
                          </div>`;
             } else {
                 html += `<div style="background:#fcf2e8; border-radius:20px; padding:20px; text-align:center; border:1px solid #f0d5b8;">
                             <span style="font-size:20px;">⚠️</span> 部分题目未作答，无法计算总分。
                          </div>`;
             }
+            html += `</div>`;
 
+            // 答题回顾
             html += `<div style="margin-top:18px; background:#f8faff; border-radius:18px; padding:14px 16px; border:1px solid #dae6f5; max-height:200px; overflow-y:auto;">`;
             html += `<div style="font-weight:600; font-size:14px; color:#1f3f60; margin-bottom:8px;">📌 答题回顾</div>`;
             const labelMap = ['完全没有', '偶尔', '有时', '经常', '总是'];
@@ -543,34 +848,35 @@
             });
             html += `</div>`;
 
-            html += `<div class="action-row" style="margin-top:22px; justify-content:center;">
-                        <button class="btn btn-outline" id="resetAllBtn">🔄 重新测评 (清除所有记录)</button>
-                     </div>`;
+            // ⚠️ 注意：这里没有重置按钮！用户无法重新测评
 
             contentEl.innerHTML = html;
             progressText.textContent = `${TOTAL} / ${TOTAL}`;
             progressBar.style.width = `100%`;
-
-            const resetBtn = document.getElementById('resetAllBtn');
-            if (resetBtn) {
-                resetBtn.addEventListener('click', function() {
-                    if (confirm('确定要重新测评吗？当前所有答案将被清除。')) {
-                        resetAll();
-                    }
-                });
-            }
         }
 
-        function resetAll() {
-            answers.fill(null);
-            currentIndex = 0;
-            locked = false;
-            renderQuestion();
-        }
-
+        // ---------- 初始化 ----------
         function init() {
-            currentIndex = 0;
-            renderQuestion();
+            if (locked) {
+                // 如果已锁定，直接显示完成页
+                renderCompletePage();
+                return;
+            }
+
+            if (infoCompleted) {
+                // 已填写信息但未锁定，跳转到当前题目
+                // 找到第一个未答的题目，或最后一题
+                let firstUnanswered = answers.findIndex(a => a === null);
+                if (firstUnanswered === -1) {
+                    // 全部已答，跳转到最后一题
+                    currentIndex = TOTAL - 1;
+                } else {
+                    currentIndex = firstUnanswered;
+                }
+                renderQuestion();
+            } else {
+                renderInfoPage();
+            }
         }
 
         init();
